@@ -20,8 +20,19 @@ function fetchPost(postFile) {
             const postsContainer = document.getElementById('posts-container');
             const postElement = createPostElement(post);
             postsContainer.appendChild(postElement);
+            fetchMarkdownContent(post.content, postElement);
         })
         .catch(error => console.error('Error fetching post:', error));
+}
+
+function fetchMarkdownContent(markdownFile, postElement) {
+    fetch(`posts/${markdownFile}`)
+        .then(response => response.text())
+        .then(markdown => {
+            const content = postElement.querySelector('.post-content');
+            content.innerHTML = marked.parse(markdown);
+        })
+        .catch(error => console.error('Error fetching markdown content:', error));
 }
 
 function createPostElement(post) {
@@ -46,8 +57,8 @@ function createPostElement(post) {
         postDiv.appendChild(image);
     }
 
-    const content = document.createElement('p');
-    content.textContent = post.content;
+    const content = document.createElement('div');
+    content.className = 'post-content';
     postDiv.appendChild(content);
 
     return postDiv;
