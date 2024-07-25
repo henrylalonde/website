@@ -18,11 +18,18 @@ body {
     padding: 20px;
     margin-bottom: 20px;
     border-radius: 5px;
+    display: flex;
+    flex-direction: row;
 }
 
 .post img {
-    max-width: 100%;
-    height: auto;
+    max-width: 150px;
+    max-height: 100px;
+    margin-right: 20px;
+}
+
+.post-content {
+    flex: 1;
 }
 
 h1, h2, h3 {
@@ -31,4 +38,5 @@ h1, h2, h3 {
 
 p {
     font-weight: 400;
+    margin: 5px 0;
 }
