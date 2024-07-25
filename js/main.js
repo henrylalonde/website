@@ -1,6 +1,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     fetchPostsList();
+    document.getElementById('search-bar').addEventListener('input', searchPosts);
 });
+
+let allPosts = [];
 
 function fetchPostsList() {
     fetch('posts/posts.json')
@@ -17,6 +20,7 @@ function fetchPost(postFile) {
     fetch(`posts/${postFile}`)
         .then(response => response.json())
         .then(post => {
+            allPosts.push({ ...post, file: postFile });
             const postsContainer = document.getElementById('posts-container');
             const postElement = createPostElement(post, postFile);
             postsContainer.appendChild(postElement);
@@ -55,4 +59,19 @@ function createPostElement(post, postFile) {
     postDiv.appendChild(content);
 
     return postDiv;
+}
+
+function searchPosts() {
+    const query = document.getElementById('search-bar').value.toLowerCase();
+    const postsContainer = document.getElementById('posts-container');
+    postsContainer.innerHTML = '';
+    const filteredPosts = allPosts.filter(post =>
+        post.title.toLowerCase().includes(query) ||
+        post.subtitle.toLowerCase().includes(query) ||
+        post.content.toLowerCase().includes(query)
+    );
+    filteredPosts.forEach(post => {
+        const postElement = createPostElement(post, post.file);
+        postsContainer.appendChild(postElement);
+    });
 }
