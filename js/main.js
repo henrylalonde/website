@@ -1,18 +1,27 @@
 document.addEventListener('DOMContentLoaded', function() {
-    fetchPosts();
+    fetchPostsList();
 });
 
-function fetchPosts() {
+function fetchPostsList() {
     fetch('posts/posts.json')
         .then(response => response.json())
-        .then(posts => {
-            const postsContainer = document.getElementById('posts-container');
-            posts.forEach(post => {
-                const postElement = createPostElement(post);
-                postsContainer.appendChild(postElement);
+        .then(postsList => {
+            postsList.forEach(postFile => {
+                fetchPost(postFile);
             });
         })
-        .catch(error => console.error('Error fetching posts:', error));
+        .catch(error => console.error('Error fetching posts list:', error));
+}
+
+function fetchPost(postFile) {
+    fetch(`posts/${postFile}`)
+        .then(response => response.json())
+        .then(post => {
+            const postsContainer = document.getElementById('posts-container');
+            const postElement = createPostElement(post);
+            postsContainer.appendChild(postElement);
+        })
+        .catch(error => console.error('Error fetching post:', error));
 }
 
 function createPostElement(post) {
