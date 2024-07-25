@@ -58,24 +58,8 @@ function createPostElement(post, postFile) {
     date.textContent = new Date(post.date).toDateString();
     contentDiv.appendChild(date);
 
-    const snippet = document.createElement('p');
-    snippet.textContent = '...'; // Placeholder for content snippet
-    contentDiv.appendChild(snippet);
-
-    fetchMarkdownSnippet(post.content, snippet);
-
     postDiv.appendChild(contentDiv);
     return postDiv;
-}
-
-function fetchMarkdownSnippet(markdownFile, snippetElement) {
-    fetch(`posts/${markdownFile}`)
-        .then(response => response.text())
-        .then(markdown => {
-            const snippet = markdown.split('\n').slice(0, 3).join(' '); // First three lines as snippet
-            snippetElement.textContent = snippet + '...';
-        })
-        .catch(error => console.error('Error fetching markdown content:', error));
 }
 
 function searchPosts() {
