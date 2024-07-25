@@ -31,7 +31,7 @@ function fetchMarkdownContent(markdownFile, postContainer) {
 
 function createPostElement(post) {
     const postDiv = document.createElement('div');
-    postDiv.className = 'post';
+    postDiv.className = 'post-full';
 
     const title = document.createElement('h2');
     title.textContent = post.title;
