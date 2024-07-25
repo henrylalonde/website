@@ -32,33 +32,50 @@ function createPostElement(post, postFile) {
     const postDiv = document.createElement('div');
     postDiv.className = 'post';
 
+    const image = document.createElement('img');
+    if (post.image) {
+        image.src = post.image;
+    } else {
+        image.src = 'path/to/default-image.jpg'; // Default image if none provided
+    }
+    postDiv.appendChild(image);
+
+    const contentDiv = document.createElement('div');
+    contentDiv.className = 'post-content';
+
     const title = document.createElement('h2');
     const titleLink = document.createElement('a');
     titleLink.href = `post-template.html?post=${postFile.split('.')[0]}`;
     titleLink.textContent = post.title;
     title.appendChild(titleLink);
-    postDiv.appendChild(title);
+    contentDiv.appendChild(title);
 
     const subtitle = document.createElement('h3');
     subtitle.textContent = post.subtitle;
-    postDiv.appendChild(subtitle);
+    contentDiv.appendChild(subtitle);
 
     const date = document.createElement('p');
     date.textContent = new Date(post.date).toDateString();
-    postDiv.appendChild(date);
+    contentDiv.appendChild(date);
 
-    if (post.image) {
-        const image = document.createElement('img');
-        image.src = post.image;
-        postDiv.appendChild(image);
-    }
+    const snippet = document.createElement('p');
+    snippet.textContent = '...'; // Placeholder for content snippet
+    contentDiv.appendChild(snippet);
 
-    const content = document.createElement('div');
-    content.className = 'post-content';
-    content.textContent = post.content.substring(0, 100) + '...'; // Short preview of the content
-    postDiv.appendChild(content);
+    fetchMarkdownSnippet(post.content, snippet);
 
+    postDiv.appendChild(contentDiv);
     return postDiv;
+}
+
+function fetchMarkdownSnippet(markdownFile, snippetElement) {
+    fetch(`posts/${markdownFile}`)
+        .then(response => response.text())
+        .then(markdown => {
+            const snippet = markdown.split('\n').slice(0, 3).join(' '); // First three lines as snippet
+            snippetElement.textContent = snippet + '...';
+        })
+        .catch(error => console.error('Error fetching markdown content:', error));
 }
 
 function searchPosts() {
