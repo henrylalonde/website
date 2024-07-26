@@ -8,6 +8,19 @@ body {
     position: relative; /* Added to position the gradient div */
 }
 
+.svg-container {
+    position: absolute;
+    top: 0px;
+    left: 10px;
+    width: 20%;
+    max-width: 150px
+}
+
+    .svg-container img {
+        width: 100%;
+        height: auto;
+    }
+
 .gradient-overlay {
     position: absolute;
     top: 0;
@@ -75,7 +88,12 @@ body {
     flex: 1;
 }
 
-h1, h2, h3 {
+h1 {
+    font-weight: 700;
+    margin: 50px, 0px, 2px, 0px;
+}
+
+h2, h3 {
     font-weight: 700;
     margin: 2px 0px 2px 0px;
 }
@@ -113,7 +131,7 @@ p {
 @media (max-width: 768px) {
     body {
         margin: 0;
-        padding: 10px;
+        padding: 20px, 10px, 10px, 10px;
     }
 
     #posts-container, #post-container {
@@ -136,4 +154,5 @@ p {
     .post-full {
         border: 0;
     }
+
 }
