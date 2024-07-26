@@ -117,7 +117,7 @@ p {
     }
 
         .post img {
-            width: 100%;
+            width: auto;
             height: auto; /* Ensures the aspect ratio is maintained */
             margin: 0 0 10px 0;
         }
