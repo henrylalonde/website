@@ -55,7 +55,7 @@ function createPostElement(post, postFile) {
     contentDiv.appendChild(subtitle);
 
     const date = document.createElement('p');
-    date.textContent = new Date(post.date).toDateString();
+    date.textContent = post.date;
     contentDiv.appendChild(date);
 
     postDiv.appendChild(contentDiv);
@@ -69,7 +69,7 @@ function searchPosts() {
     const filteredPosts = allPosts.filter(post =>
         post.title.toLowerCase().includes(query) ||
         post.subtitle.toLowerCase().includes(query) ||
-        post.content.toLowerCase().includes(query)
+        post.date.toLowerCase().includes(query)
     );
     filteredPosts.forEach(post => {
         const postElement = createPostElement(post, post.file);
