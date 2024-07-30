@@ -1,31 +1,71 @@
-document.addEventListener('DOMContentLoaded', function() {
-    fetchPostsList();
+document.addEventListener('DOMContentLoaded', function () {
+    fetchNextPost();
     document.getElementById('search-bar').addEventListener('input', searchPosts);
 });
 
 let allPosts = [];
+let postIndex = 1;
+let postsRendered = 0;
+let postsToRender = [];
+const postsPerLoad = 5;
+let observer;
 
-function fetchPostsList() {
-    fetch('posts/posts.json')
-        .then(response => response.json())
-        .then(postsList => {
-            postsList.forEach(postFile => {
-                fetchPost(postFile);
-            });
-        })
-        .catch(error => console.error('Error fetching posts list:', error));
-}
-
-function fetchPost(postFile) {
+function fetchNextPost() {
+    const postFile = `post${postIndex}.json`;
     fetch(`posts/${postFile}`)
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Post not found');
+            }
+            return response.json();
+        })
         .then(post => {
             allPosts.push({ ...post, file: postFile });
-            const postsContainer = document.getElementById('posts-container');
-            const postElement = createPostElement(post, postFile);
-            postsContainer.appendChild(postElement);
+            postIndex++;
+            fetchNextPost(); // Fetch the next post
         })
-        .catch(error => console.error('Error fetching post:', error));
+        .catch(error => {
+            if (error.message === 'Post not found') {
+                // Sort posts in descending order based on the file name
+                allPosts.sort((a, b) => {
+                    const aIndex = parseInt(a.file.match(/\d+/)[0]);
+                    const bIndex = parseInt(b.file.match(/\d+/)[0]);
+                    return bIndex - aIndex;
+                });
+                postsToRender = allPosts;
+                renderPosts();
+                observeLastPost();
+            } else {
+                console.error('Error fetching post:', error);
+            }
+        });
+}
+
+function renderPosts() {
+    const postsContainer = document.getElementById('posts-container');
+    const postsBatch = postsToRender.slice(postsRendered, postsRendered + postsPerLoad);
+    postsBatch.forEach(post => {
+        const postElement = createPostElement(post, post.file);
+        postsContainer.appendChild(postElement);
+    });
+    postsRendered += postsPerLoad;
+}
+
+function observeLastPost() {
+    const postsContainer = document.getElementById('posts-container');
+    const lastPost = postsContainer.lastElementChild;
+
+    if (lastPost) {
+        observer = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                observer.unobserve(lastPost);
+                renderPosts();
+                observeLastPost();
+            }
+        }, { threshold: 1.0 });
+
+        observer.observe(lastPost);
+    }
 }
 
 function createPostElement(post, postFile) {
@@ -36,7 +76,7 @@ function createPostElement(post, postFile) {
     if (post.image) {
         image.src = post.image;
     } else {
-        image.src = 'path/to/default-image.jpg'; // Default image if none provided
+        image.src = 'path/to/default-image.jpg';
     }
     postDiv.appendChild(image);
 
@@ -66,13 +106,12 @@ function searchPosts() {
     const query = document.getElementById('search-bar').value.toLowerCase();
     const postsContainer = document.getElementById('posts-container');
     postsContainer.innerHTML = '';
-    const filteredPosts = allPosts.filter(post =>
+    postsRendered = 0;
+    postsToRender = allPosts.filter(post =>
         post.title.toLowerCase().includes(query) ||
         post.subtitle.toLowerCase().includes(query) ||
         post.date.toLowerCase().includes(query)
     );
-    filteredPosts.forEach(post => {
-        const postElement = createPostElement(post, post.file);
-        postsContainer.appendChild(postElement);
-    });
+    renderPosts();
+    observeLastPost();
 }
